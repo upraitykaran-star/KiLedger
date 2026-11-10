@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#eef7f0" />
+    <title>Sign in | KiLedger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body class="auth-page">
+    <a class="brand auth-brand" href="index.html"
+      ><span class="brand-mark">K</span>KiLedger</a
+    >
+    <main class="auth-layout">
+      <section class="auth-intro">
+        <span class="eyebrow"><i></i> A CALMER WAY TO KEEP THE BOOKS</span>
+        <h1>Know your numbers.<br /><em>Keep your next move clear.</em></h1>
+        <p>
+          Customers, stock, transactions and payments together in one useful
+          workspace.
+        </p>
+        <div class="auth-points">
+          <span>✓ Starts with your own empty account</span
+          ><span>✓ Separate records for every business</span
+          ><span>✓ Simple roles for growing networks</span>
+        </div>
+        <div class="auth-illustration">
+          <div>
+            <small>YOUR BUSINESS BOOKS</small
+            ><b>Clarity, one entry at a time.</b
+            ><span>＋ &nbsp; Add a customer or record</span>
+          </div>
+        </div>
+      </section>
+      <section class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-mode="login">Log in</button
+          ><button class="auth-tab" data-mode="signup">Create account</button>
+        </div>
+        <div id="auth-content"></div>
+        <a class="back-link" href="index.html">← Back to KiLedger</a>
+      </section>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="js/auth.js"></script>
+  </body>
+</html>

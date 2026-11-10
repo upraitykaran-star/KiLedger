@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Environment and local services
+.env
+.env.*
+!.env.example
+*.log
+mongodb-data/
+
+# macOS / editor
+.DS_Store
+.vscode/
