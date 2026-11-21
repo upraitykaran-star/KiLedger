@@ -5,8 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     environment: str = "development"
-    mongodb_uri: str = "mongodb://localhost:27017/?replicaSet=rs0"
-    database: str = "kileger"
+    database_url: str = "mysql+pymysql://kileger:change-me@127.0.0.1:3306/kileger?charset=utf8mb4"
     session_cookie: str = "kileger_session"
     session_days: int = 7
     cookie_secure: bool = False

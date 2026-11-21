@@ -1,28 +1,33 @@
-"""Mongo-backed API tests. Set KILEDGER_TEST_MONGODB_URI to a replica set URI to run."""
-import os
+"""API tests run against an isolated in-memory SQLite database."""
 import uuid
+from contextlib import asynccontextmanager
 
 import pytest
+pytest.importorskip("fastapi")
+pytest.importorskip("sqlalchemy")
+
 from fastapi.testclient import TestClient
-from pymongo import MongoClient
-
-from backend import main
-
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 @pytest.fixture
 def clients(monkeypatch):
-    uri = os.getenv("KILEDGER_TEST_MONGODB_URI")
-    if not uri:
-        pytest.skip("Set KILEDGER_TEST_MONGODB_URI to an isolated MongoDB replica set for API integration tests")
-    database = f"kileger_test_{uuid.uuid4().hex}"
-    monkeypatch.setattr(main.settings, "mongodb_uri", uri)
-    monkeypatch.setattr(main.settings, "database", database)
-    first, second = TestClient(main.app), TestClient(main.app)
+    from backend import main
+    from backend.database import init_database
+    monkeypatch.setattr(main.settings, "database_url", "sqlite:///:memory:")
+    monkeypatch.setattr(main.settings, "allowed_hosts", "localhost,127.0.0.1,testserver")
+    engine = create_engine("sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+    init_database(engine)
+    factory = sessionmaker(bind=engine, expire_on_commit=False)
+    monkeypatch.setattr(main, "SessionFactory", factory)
+    @asynccontextmanager
+    async def test_lifespan(_app):
+        yield
+    monkeypatch.setattr(main.app.router, "lifespan_context", test_lifespan)
+    first, second = TestClient(main.app, headers={"host": "localhost"}), TestClient(main.app, headers={"host": "localhost"})
     with first, second:
         yield first, second
-    cleanup = MongoClient(uri, serverSelectionTimeoutMS=3000)
-    cleanup.drop_database(database)
-    cleanup.close()
+    engine.dispose()
 
 
 def register(client, email):
@@ -74,4 +79,5 @@ def test_transaction_validation(clients):
     csrf = register(first, f"{uuid.uuid4().hex}@example.com")
     invalid = {"description": "Zero", "amount_minor": 0, "type": "income", "date": "2026-10-28"}
     assert first.post("/api/v1/transactions", headers={"X-CSRF-Token": csrf}, json=invalid).status_code == 422
+    first.post("/api/v1/auth/logout", headers={"X-CSRF-Token": csrf})
     assert first.get("/api/v1/customers").status_code == 401

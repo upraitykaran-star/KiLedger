@@ -1,5 +1,0 @@
-target/
-.env
-taskmate.properties
-*.log
-.DS_Store
